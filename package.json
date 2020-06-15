@@ -1,0 +1,31 @@
+{
+  "name": "xrpackage-web",
+  "version": "0.0.1",
+  "description": "The xrpackage.org website",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint --fix --ext .js,.jsx ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/webaverse/xrpackage-web.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/webaverse/xrpackage-web/issues"
+  },
+  "homepage": "https://xrpackage.org",
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "browserslist": [
+    "last 1 chrome version"
+  ],
+  "devDependencies": {
+    "eslint": "^7.2.0",
+    "eslint-config-semistandard": "^15.0.0"
+  }
+}
