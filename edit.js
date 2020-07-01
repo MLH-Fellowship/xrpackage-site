@@ -16,6 +16,7 @@ import {
   worldSaveButton, worldRevertButton, micButton, dropdownButton, sandboxButton, newWorldButton,
   packagesSubpage, inventorySubpage, avatarSubpage, avatarSubpageContent,
   tabs, tabContents, inventorySubtabContent,
+  scaleSlider, shieldSlider,
   runMode, editMode,
   dropdown,
 } from './edit/domElements.js';
@@ -41,6 +42,27 @@ const localQuaternion2 = new THREE.Quaternion();
 const localEuler = new THREE.Euler();
 const localMatrix = new THREE.Matrix4();
 const localMatrix2 = new THREE.Matrix4();
+
+const keys = {
+  up: false,
+  down: false,
+  left: false,
+  right: false,
+  shift: false,
+};
+
+let shieldLevel = parseInt(shieldSlider.value, 10);
+let selectedTool = 'camera';
+let currentWorldId = '';
+let hoverTarget = null;
+let selectTarget = null;
+let currentWorldChanged = false;
+
+const _resetKeys = () => {
+  for (const k in keys) {
+    keys[k] = false;
+  }
+};
 
 function parseQuery(queryString) {
   var query = {};
@@ -297,7 +319,6 @@ bindUploadFileButton(document.getElementById('import-scene-input'), async file =
   await pe.importScene(uint8Array);
 });
 
-let selectedTool = 'camera';
 const _getAvatarHeight = () => (pe.rig ? pe.rig.height : 1) * 0.9;
 const birdsEyeHeight = 10;
 const avatarCameraOffset = new THREE.Vector3(0, 0, -1);
@@ -421,18 +442,6 @@ document.addEventListener('pointerlockchange', e => {
   }
 });
 
-const keys = {
-  up: false,
-  down: false,
-  left: false,
-  right: false,
-  shift: false,
-};
-const _resetKeys = () => {
-  for (const k in keys) {
-    keys[k] = false;
-  }
-};
 window.addEventListener('keydown', e => {
   switch (e.which) {
     case 49: // 1
@@ -691,8 +700,6 @@ const _ensureVolumeMesh = async p => {
     scene.add(p.volumeMesh);
   }
 };
-const shieldSlider = document.getElementById('shield-slider');
-let shieldLevel = parseInt(shieldSlider.value, 10);
 shieldSlider.addEventListener('change', async e => {
   const newShieldLevel = parseInt(e.target.value, 10);
   const {packages} = pe;
@@ -717,7 +724,6 @@ shieldSlider.addEventListener('change', async e => {
     }
   }
 });
-const scaleSlider = document.getElementById('scale-slider');
 scaleSlider.addEventListener('change', async e => {
   const newScale = parseFloat(e.target.value);
   pe.setScale(newScale);
@@ -726,8 +732,6 @@ document.getElementById('toggle-stage-button').addEventListener('click', e => {
   floorMesh.visible = !floorMesh.visible;
 });
 
-let hoverTarget = null;
-let selectTarget = null;
 const _setSelectTarget = newSelectTarget => {
   if (selectTarget && selectTarget.control) {
     _unbindTransformControls(selectTarget);
@@ -788,7 +792,7 @@ const _packageremove = e => {
     _updateWorldSaveButton();
   }
 };
-let currentWorldChanged = false;
+
 const _updateWorldSaveButton = () => {
   if (currentWorldChanged && currentWorldId) {
     worldSaveButton.classList.remove('hidden');
@@ -1056,7 +1060,7 @@ const _makeWorldHtml = w => `
   </div>
 `;
 const headerLabel = document.getElementById('header-label');
-let currentWorldId = '';
+
 const _enterWorld = async worldId => {
   currentWorldId = worldId;
 
