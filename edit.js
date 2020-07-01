@@ -1,7 +1,6 @@
 /* global Web3 */
 /* eslint no-unused-vars: 0 */
 import * as THREE from 'https://static.xrpackage.org/xrpackage/three.module.js';
-import {BufferGeometryUtils} from 'https://static.xrpackage.org/BufferGeometryUtils.js';
 import {TransformControls} from 'https://static.xrpackage.org/TransformControls.js';
 // import address from 'https://contracts.webaverse.com/address.js';
 // import abi from 'https://contracts.webaverse.com/abi.js';
@@ -9,6 +8,8 @@ import {XRPackage, pe, renderer, scene, camera, floorMesh, proxySession, getReal
 import {downloadFile, readFile, bindUploadFileButton} from 'https://static.xrpackage.org/xrpackage/util.js';
 import {wireframeMaterial, getWireframeMesh, meshIdToArray, decorateRaycastMesh, VolumeRaycaster} from './volume.js';
 import './gif.js';
+
+import targetMeshGeometry from './edit/targetMeshGeometry.js';
 
 const apiHost = 'https://ipfs.exokit.org/ipfs';
 const presenceEndpoint = 'wss://presence.exokit.org';
@@ -42,46 +43,6 @@ function parseQuery(queryString) {
   return query;
 }
 
-const targetMeshGeometry = (() => {
-  const targetGeometry = BufferGeometryUtils.mergeBufferGeometries([
-    new THREE.BoxBufferGeometry(0.03, 0.2, 0.03)
-      .applyMatrix4(new THREE.Matrix4().makeTranslation(0, -0.1, 0)),
-    new THREE.BoxBufferGeometry(0.03, 0.2, 0.03)
-      .applyMatrix4(new THREE.Matrix4().makeRotationFromQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, -1, 0), new THREE.Vector3(0, 0, 1))))
-      .applyMatrix4(new THREE.Matrix4().makeTranslation(0, 0, 0.1)),
-    new THREE.BoxBufferGeometry(0.03, 0.2, 0.03)
-      .applyMatrix4(new THREE.Matrix4().makeRotationFromQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, -1, 0), new THREE.Vector3(1, 0, 0))))
-      .applyMatrix4(new THREE.Matrix4().makeTranslation(0.1, 0, 0)),
-  ]);
-  return BufferGeometryUtils.mergeBufferGeometries([
-    targetGeometry.clone()
-      .applyMatrix4(new THREE.Matrix4().makeTranslation(-0.5, 0.5, -0.5)),
-    targetGeometry.clone()
-      .applyMatrix4(new THREE.Matrix4().makeRotationFromQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, -1), new THREE.Vector3(0, -1, 0))))
-      .applyMatrix4(new THREE.Matrix4().makeTranslation(-0.5, -0.5, -0.5)),
-    targetGeometry.clone()
-      .applyMatrix4(new THREE.Matrix4().makeRotationFromQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), new THREE.Vector3(0, 0, 1))))
-      .applyMatrix4(new THREE.Matrix4().makeTranslation(-0.5, 0.5, 0.5)),
-    targetGeometry.clone()
-      .applyMatrix4(new THREE.Matrix4().makeRotationFromQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), new THREE.Vector3(1, 0, 0))))
-      .applyMatrix4(new THREE.Matrix4().makeTranslation(0.5, 0.5, -0.5)),
-    targetGeometry.clone()
-      .applyMatrix4(new THREE.Matrix4().makeRotationFromQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), new THREE.Vector3(1, 0, 0))))
-      .applyMatrix4(new THREE.Matrix4().makeRotationFromQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), new THREE.Vector3(0, 0, 1))))
-      .applyMatrix4(new THREE.Matrix4().makeTranslation(0.5, 0.5, 0.5)),
-    targetGeometry.clone()
-      .applyMatrix4(new THREE.Matrix4().makeRotationFromQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), new THREE.Vector3(0, 0, 1))))
-      .applyMatrix4(new THREE.Matrix4().makeRotationFromQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(-1, 0, 0), new THREE.Vector3(0, -1, 0))))
-      .applyMatrix4(new THREE.Matrix4().makeTranslation(-0.5, -0.5, 0.5)),
-    targetGeometry.clone()
-      .applyMatrix4(new THREE.Matrix4().makeRotationFromQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), new THREE.Vector3(1, 0, 0))))
-      .applyMatrix4(new THREE.Matrix4().makeRotationFromQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(1, 0, 0), new THREE.Vector3(0, -1, 0))))
-      .applyMatrix4(new THREE.Matrix4().makeTranslation(0.5, -0.5, -0.5)),
-    targetGeometry.clone()
-      .applyMatrix4(new THREE.Matrix4().makeRotationFromQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(-1, 1, 0).normalize(), new THREE.Vector3(1, -1, 0).normalize())))
-      .applyMatrix4(new THREE.Matrix4().makeTranslation(0.5, -0.5, 0.5)),
-  ]);// .applyMatrix4(new THREE.Matrix4().makeTranslation(0, 0.5, 0));
-})();
 const targetVsh = `
   #define M_PI 3.1415926535897932384626433832795
   uniform float uTime;
